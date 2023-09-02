@@ -7,11 +7,11 @@ export class UserService {
 
   constructor(private readonly userRepository: UserRepository) { }
 
-  createUser(createUserDto: CreateUserDto) {
-    return this.userRepository.createUser(createUserDto);
+  async createUser(createUserDto: CreateUserDto) {
+    return await this.userRepository.createUser(createUserDto);
   }
 
-  findOneUser(id: number) {
-    return this.userRepository.findOneUser(id);
+  async findOneUser(id: number) {
+    return await this.userRepository.findOneUser(id);
   }
 }
