@@ -7,8 +7,8 @@ export class UserService {
 
   constructor(private readonly userRepository: UserRepository) { }
 
-  async createUser(createUserDto: CreateUserDto) {
-    return await this.userRepository.createUser(createUserDto);
+  async createUser(email: string, incryptedPassword: string) {
+    return await this.userRepository.createUser(email, incryptedPassword);
   }
 
   async getUserByEmail(email: string) {

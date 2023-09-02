@@ -18,10 +18,13 @@ export class AuthService {
     private readonly userService: UserService) { }
 
   async signUp(signUpDto: SignUpDto) {
-    const user = await this.userService.getUserByEmail(signUpDto.email);
-    if (user) throw new ConflictException("Email already in use.")
+    const { email, password } = signUpDto;
+    const user = await this.userService.getUserByEmail(email);
+    if (user) throw new ConflictException("Email already in use.");
 
-    return await this.userService.createUser(signUpDto);
+    const incryptedPassword = bcrypt.hashSync(password, 10);
+
+    return await this.userService.createUser(email, incryptedPassword);
   }
 
   async signIn(signInDto: SignInDto) {

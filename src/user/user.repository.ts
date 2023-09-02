@@ -7,9 +7,12 @@ export class UserRepository {
 
   constructor(private prisma: PrismaService) { }
 
-  createUser(createUserDto: CreateUserDto) {
+  createUser(email: string, incryptedPassword: string) {
     return this.prisma.user.create({
-      data: createUserDto
+      data: {
+        email,
+        password: incryptedPassword
+      }
     });
   }
 
