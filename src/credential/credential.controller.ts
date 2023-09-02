@@ -1,15 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { CredentialService } from './credential.service';
 import { CreateCredentialDto } from './dto/create-credential.dto';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
+import { AuthGuard } from '../guard/auth.guard';
+import { User as UserPrisma } from '@prisma/client';
+import { User } from '../decorators/user.decorator';
 
 @Controller('credential')
 export class CredentialController {
-  constructor(private readonly credentialService: CredentialService) {}
+  constructor(private readonly credentialService: CredentialService) { }
 
   @Post()
-  create(@Body() createCredentialDto: CreateCredentialDto) {
-    return this.credentialService.create(createCredentialDto);
+  @UseGuards(AuthGuard)
+  async createCredential(@Body() createCredentialDto: CreateCredentialDto, @User() user: UserPrisma) {
+    try {
+      return await this.credentialService.createCredential(user, createCredentialDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Get()

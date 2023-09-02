@@ -1,16 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCredentialDto } from './dto/create-credential.dto';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
-import { credentialRepository } from './credential.repository';
+import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 
 @Injectable()
-export class CredentialService {
+export class credentialRepository {
 
-  constructor(private readonly credentialRepository: credentialRepository) { }
+  constructor(private prisma: PrismaService) { }
 
-  async createCredential(user: User, createCredentialDto: CreateCredentialDto) {
-    return await this.credentialRepository.createCredential(user, createCredentialDto);
+  createCredential(user: User, createCredentialDto: CreateCredentialDto) {
+    const { title, url, username, credential_password } = createCredentialDto;
+    return this.prisma.credential.create({
+      data: {
+        title,
+        url,
+        username,
+        credential_password,
+        user: {
+          connect: user
+        }
+      }
+    });
   }
 
   findAll() {
