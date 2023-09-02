@@ -11,12 +11,19 @@ export class credentialRepository {
 
   createCredential(user: User, createCredentialDto: CreateCredentialDto) {
     const { title, url, username, credential_password } = createCredentialDto;
+
+    const Cryptr = require('cryptr');
+    const cryptr = new Cryptr('myTotallySecretKey');
+    const encryptedpw = cryptr.encrypt(credential_password);
+    const dc = cryptr.decrypt(encryptedpw);
+    console.log(dc);
+
     return this.prisma.credential.create({
       data: {
         title,
         url,
         username,
-        credential_password,
+        credential_password: encryptedpw,
         user: {
           connect: user
         }
@@ -24,12 +31,16 @@ export class credentialRepository {
     });
   }
 
-  findAll() {
-    return `This action returns all credential`;
+  findAllCredentials(user: User) {
+    return this.prisma.credential.findMany({
+      where: { userId: user.id }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} credential`;
+  findOneCredential(id: number) {
+    return this.prisma.credential.findUnique({
+      where: { id }
+    });
   }
 
   update(id: number, updateCredentialDto: UpdateCredentialDto) {

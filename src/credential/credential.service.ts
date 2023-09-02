@@ -3,6 +3,7 @@ import { CreateCredentialDto } from './dto/create-credential.dto';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { credentialRepository } from './credential.repository';
 import { User } from '@prisma/client';
+import { title } from 'process';
 
 @Injectable()
 export class CredentialService {
@@ -13,12 +14,19 @@ export class CredentialService {
     return await this.credentialRepository.createCredential(user, createCredentialDto);
   }
 
-  findAll() {
-    return `This action returns all credential`;
+  async findAllCredentials(user: User) {
+    const Cryptr = require('cryptr');
+    const cryptr = new Cryptr('myTotallySecretKey');
+    const credentials = await this.credentialRepository.findAllCredentials(user);
+    const decryptedCredentials = credentials.map((c) => {
+      return { ...c, credential_password: cryptr.decrypt(c.credential_password) }
+    });
+
+    return decryptedCredentials;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} credential`;
+  findOneCredential(id: number) {
+    return this.credentialRepository.findOneCredential(id);
   }
 
   update(id: number, updateCredentialDto: UpdateCredentialDto) {

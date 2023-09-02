@@ -7,11 +7,11 @@ import { User as UserPrisma } from '@prisma/client';
 import { User } from '../decorators/user.decorator';
 
 @Controller('credential')
+@UseGuards(AuthGuard)
 export class CredentialController {
   constructor(private readonly credentialService: CredentialService) { }
 
   @Post()
-  @UseGuards(AuthGuard)
   async createCredential(@Body() createCredentialDto: CreateCredentialDto, @User() user: UserPrisma) {
     try {
       return await this.credentialService.createCredential(user, createCredentialDto);
@@ -21,13 +21,21 @@ export class CredentialController {
   }
 
   @Get()
-  findAll() {
-    return this.credentialService.findAll();
+  async findAllCredentials(@User() user: UserPrisma) {
+    try {
+      return await this.credentialService.findAllCredentials(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.credentialService.findOne(+id);
+  async findOneCredential(@Param('id') id: string, @User() user: UserPrisma) {
+    try {
+      return await this.credentialService.findOneCredential(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Patch(':id')
