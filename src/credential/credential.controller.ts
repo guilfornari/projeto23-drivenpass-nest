@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { CredentialService } from './credential.service';
 import { CreateCredentialDto } from './dto/create-credential.dto';
-import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { AuthGuard } from '../guard/auth.guard';
 import { User as UserPrisma } from '@prisma/client';
 import { User } from '../decorators/user.decorator';
@@ -32,19 +31,18 @@ export class CredentialController {
   @Get(':id')
   async findOneCredential(@Param('id') id: string, @User() user: UserPrisma) {
     try {
-      return await this.credentialService.findOneCredential(+id);
+      return await this.credentialService.findOneCredential(+id, user);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCredentialDto: UpdateCredentialDto) {
-    return this.credentialService.update(+id, updateCredentialDto);
-  }
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.credentialService.remove(+id);
+  async removeCredential(@Param('id') id: string, @User() user: UserPrisma) {
+    try {
+      return await this.credentialService.removeCredential(+id, user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 }

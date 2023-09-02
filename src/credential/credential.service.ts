@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCredentialDto } from './dto/create-credential.dto';
-import { UpdateCredentialDto } from './dto/update-credential.dto';
 import { credentialRepository } from './credential.repository';
 import { User } from '@prisma/client';
-import { title } from 'process';
 
 @Injectable()
 export class CredentialService {
@@ -25,15 +23,32 @@ export class CredentialService {
     return decryptedCredentials;
   }
 
-  findOneCredential(id: number) {
-    return this.credentialRepository.findOneCredential(id);
+  async findOneCredential(id: number, user: User) {
+
+    const credential = await this.credentialRepository.findOneCredential(id);
+    if (!credential) throw new HttpException("This credential does not exist", HttpStatus.NOT_FOUND);
+    if (credential.userId !== user.id) throw new HttpException("Not your credential", HttpStatus.FORBIDDEN);
+
+    const Cryptr = require('cryptr');
+    const cryptr = new Cryptr('myTotallySecretKey');
+
+    const decryptedCredential = {
+      id: credential.id,
+      title: credential.title,
+      url: credential.url,
+      username: credential.username,
+      credential_password: cryptr.decrypt(credential.credential_password),
+      userId: credential.userId
+    }
+    return decryptedCredential;
   }
 
-  update(id: number, updateCredentialDto: UpdateCredentialDto) {
-    return `This action updates a #${id} credential`;
-  }
+  async removeCredential(id: number, user: User) {
 
-  remove(id: number) {
-    return `This action removes a #${id} credential`;
+    const credential = await this.credentialRepository.findOneCredential(id);
+    if (!credential) throw new HttpException("This credential does not exist", HttpStatus.NOT_FOUND);
+    if (credential.userId !== user.id) throw new HttpException("Not your credential", HttpStatus.FORBIDDEN);
+
+    return this.credentialRepository.removeCredential(id);
   }
 }
