@@ -11,7 +11,7 @@ export class UserService {
     return await this.userRepository.createUser(createUserDto);
   }
 
-  async findOneUser(id: number) {
-    return await this.userRepository.findOneUser(id);
+  async getUserByEmail(email: string) {
+    return await this.userRepository.getUserByEmail(email);
   }
 }
