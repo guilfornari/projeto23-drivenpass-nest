@@ -5,7 +5,6 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class CredentialRepository {
-
   constructor(private prisma: PrismaService) { }
 
   createCredential(user: User, createCredentialDto: CreateCredentialDto) {
@@ -14,8 +13,6 @@ export class CredentialRepository {
     const Cryptr = require('cryptr');
     const cryptr = new Cryptr('myTotallySecretKey');
     const encryptedpw = cryptr.encrypt(credential_password);
-    const dc = cryptr.decrypt(encryptedpw);
-    console.log(dc);
 
     return this.prisma.credential.create({
       data: {

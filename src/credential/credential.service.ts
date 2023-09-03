@@ -5,7 +5,6 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class CredentialService {
-
   constructor(private readonly credentialRepository: CredentialRepository) { }
 
   async createCredential(user: User, createCredentialDto: CreateCredentialDto) {

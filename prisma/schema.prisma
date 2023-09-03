@@ -14,6 +14,7 @@ model User {
   createAt   DateTime     @default(now())
   Credential Credential[]
   Note       Note[]
+  Card       Card[]
 }
 
 model Credential {
@@ -34,6 +35,22 @@ model Note {
   note   String
   user   User   @relation(fields: [userId], references: [id])
   userId Int
+
+  @@unique([title, userId])
+}
+
+model Card {
+  id       Int     @id @default(autoincrement())
+  title    String
+  number   String
+  name     String
+  safeCode String
+  expDate  String
+  password String
+  virtual  Boolean
+  type     String
+  user     User    @relation(fields: [userId], references: [id])
+  userId   Int
 
   @@unique([title, userId])
 }

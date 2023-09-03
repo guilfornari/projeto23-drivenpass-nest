@@ -7,9 +7,10 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CredentialModule } from './credential/credential.module';
 import { NoteModule } from './note/note.module';
+import { CardModule } from './card/card.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule, CredentialModule, NoteModule],
+  imports: [PrismaModule, UserModule, AuthModule, CredentialModule, NoteModule, CardModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
