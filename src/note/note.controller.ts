@@ -20,17 +20,29 @@ export class NoteController {
   }
 
   @Get()
-  findAll() {
-    return this.noteService.findAll();
+  async findAllNotes(@User() user: UserPrisma) {
+    try {
+      return await this.noteService.findAllNotes(user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.noteService.findOne(+id);
+  async findOneNote(@Param('id') id: string, @User() user: UserPrisma) {
+    try {
+      return await this.noteService.findOneNote(+id, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.noteService.remove(+id);
+  async removeNote(@Param('id') id: string, @User() user: UserPrisma) {
+    try {
+      return await this.noteService.removeNote(+id, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 }

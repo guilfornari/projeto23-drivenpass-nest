@@ -21,15 +21,21 @@ export class NoteRepository {
     });
   }
 
-  findAll() {
-    return `This action returns all note`;
+  findAllNotes(userId: number) {
+    return this.prisma.note.findMany({
+      where: { userId }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
+  findOneNote(id: number) {
+    return this.prisma.note.findUnique({
+      where: { id }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  removeNote(id: number) {
+    return this.prisma.note.delete({
+      where: { id }
+    });
   }
 }

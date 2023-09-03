@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { NoteRepository } from './note.repository';
 import { User } from '@prisma/client';
@@ -12,15 +12,23 @@ export class NoteService {
     return await this.noteRepository.createNote(user, createNoteDto);
   }
 
-  findAll() {
-    return `This action returns all note`;
+  async findAllNotes(userId: number) {
+    return await this.noteRepository.findAllNotes(userId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} note`;
+  async findOneNote(id: number, userId: number) {
+    const note = await this.noteRepository.findOneNote(id);
+    if (!note) throw new HttpException("This note does not exist", HttpStatus.NOT_FOUND);
+    if (note.userId !== userId) throw new HttpException("This is not your note", HttpStatus.FORBIDDEN);
+
+    return note;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} note`;
+  async removeNote(id: number, userId: number) {
+    const note = await this.noteRepository.findOneNote(id);
+    if (!note) throw new HttpException("This note does not exist", HttpStatus.NOT_FOUND);
+    if (note.userId !== userId) throw new HttpException("This is not your note", HttpStatus.FORBIDDEN);
+
+    return await this.noteRepository.removeNote(id);
   }
 }
