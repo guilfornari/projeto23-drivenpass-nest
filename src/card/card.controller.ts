@@ -20,17 +20,29 @@ export class CardController {
   }
 
   @Get()
-  findAll() {
-    return this.cardService.findAll();
+  async findAllCards(@User() user: UserPrisma) {
+    try {
+      return await this.cardService.findAllCards(user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cardService.findOne(+id);
+  async findOneCard(@Param('id') id: string, @User() user: UserPrisma) {
+    try {
+      return await this.cardService.findOneCard(+id, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cardService.remove(+id);
+  async removeCard(@Param('id') id: string, @User() user: UserPrisma) {
+    try {
+      return this.cardService.removeCard(+id, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 }

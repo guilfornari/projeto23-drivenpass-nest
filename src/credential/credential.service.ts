@@ -18,7 +18,6 @@ export class CredentialService {
     const decryptedCredentials = credentials.map((c) => {
       return { ...c, credential_password: cryptr.decrypt(c.credential_password) }
     });
-
     return decryptedCredentials;
   }
 

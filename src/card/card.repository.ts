@@ -32,15 +32,21 @@ export class CardRepository {
     });
   }
 
-  findAll() {
-    return `This action returns all card`;
+  findAllCards(userId: number) {
+    return this.prisma.card.findMany({
+      where: { userId }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} card`;
+  findOneCard(id: number) {
+    return this.prisma.card.findUnique({
+      where: { id }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} card`;
+  removeCard(id: number) {
+    return this.prisma.card.delete({
+      where: { id }
+    });
   }
 }
