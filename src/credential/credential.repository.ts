@@ -8,18 +8,10 @@ export class CredentialRepository {
   constructor(private prisma: PrismaService) { }
 
   createCredential(user: User, createCredentialDto: CreateCredentialDto) {
-    const { title, url, username, credential_password } = createCredentialDto;
-
-    const Cryptr = require('cryptr');
-    const cryptr = new Cryptr('myTotallySecretKey');
-    const encryptedpw = cryptr.encrypt(credential_password);
 
     return this.prisma.credential.create({
       data: {
-        title,
-        url,
-        username,
-        credential_password: encryptedpw,
+        ...createCredentialDto,
         user: {
           connect: user
         }
@@ -36,6 +28,17 @@ export class CredentialRepository {
   findOneCredential(id: number) {
     return this.prisma.credential.findUnique({
       where: { id }
+    });
+  }
+
+  findCredentialByTitle(title: string, userId: number) {
+    return this.prisma.credential.findUnique({
+      where: {
+        title_userId: {
+          title,
+          userId
+        }
+      }
     });
   }
 

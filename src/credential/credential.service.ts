@@ -1,24 +1,35 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCredentialDto } from './dto/create-credential.dto';
 import { CredentialRepository } from './credential.repository';
-import { User } from '@prisma/client';
+import { Credential, User } from '@prisma/client';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Injectable()
 export class CredentialService {
-  constructor(private readonly credentialRepository: CredentialRepository) { }
+  constructor(private readonly credentialRepository: CredentialRepository,
+    private readonly cryptoService: CryptoService) { }
 
   async createCredential(user: User, createCredentialDto: CreateCredentialDto) {
-    return await this.credentialRepository.createCredential(user, createCredentialDto);
+    const title = await this.credentialRepository.findCredentialByTitle(createCredentialDto.title, user.id);
+    if (title) throw new ConflictException("You already have a credential with this title");
+    return await this.credentialRepository.createCredential(user, {
+      ...createCredentialDto,
+      credential_password: this.cryptoService.encrypt(createCredentialDto.credential_password)
+    });
   }
 
   async findAllCredentials(user: User) {
-    const Cryptr = require('cryptr');
-    const cryptr = new Cryptr('myTotallySecretKey');
     const credentials = await this.credentialRepository.findAllCredentials(user);
-    const decryptedCredentials = credentials.map((c) => {
-      return { ...c, credential_password: cryptr.decrypt(c.credential_password) }
+    return this.decriptAllCredentials(credentials);
+  }
+
+  private decriptAllCredentials(credentials: Credential[]) {
+    return credentials.map(credential => {
+      return {
+        ...credential,
+        credential_password: this.cryptoService.decrypt(credential.credential_password)
+      }
     });
-    return decryptedCredentials;
   }
 
   async findOneCredential(id: number, user: User) {
