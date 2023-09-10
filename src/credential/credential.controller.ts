@@ -17,23 +17,15 @@ export class CredentialController {
   @ApiOperation({ summary: "Creates a new credential" })
   @ApiCreatedResponse({ description: "Created" })
   @HttpCode(HttpStatus.CREATED)
-  async createCredential(@Body() createCredentialDto: CreateCredentialDto, @User() user: UserPrisma) {
-    try {
-      return await this.credentialService.createCredential(user, createCredentialDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+  createCredential(@Body() createCredentialDto: CreateCredentialDto, @User() user: UserPrisma) {
+    return this.credentialService.createCredential(user, createCredentialDto);
   }
 
   @Get()
   @ApiOperation({ summary: "Finds all user's credentials" })
   @ApiOkResponse({ description: "Returns an array with all credentials" })
-  async findAllCredentials(@User() user: UserPrisma) {
-    try {
-      return await this.credentialService.findAllCredentials(user);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+  findAllCredentials(@User() user: UserPrisma) {
+    return this.credentialService.findAllCredentials(user);
   }
 
   @Get(':id')
@@ -43,12 +35,8 @@ export class CredentialController {
   @ApiForbiddenResponse({ description: "Not your credential" })
   @ApiParam({ name: "id", description: "An integer", example: 42 })
   async findOneCredential(@Param('id') id: string, @User() user: UserPrisma) {
-    try {
-      const credential = await this.credentialService.findOneCredential(+id, user);
-      return credential[0];
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+    const credential = await this.credentialService.findOneCredential(+id, user);
+    return credential[0];
   }
 
   @Delete(':id')
@@ -58,10 +46,6 @@ export class CredentialController {
   @ApiForbiddenResponse({ description: "Not your credential" })
   @ApiParam({ name: "id", description: "An integer", example: 42 })
   async removeCredential(@Param('id') id: string, @User() user: UserPrisma) {
-    try {
-      return await this.credentialService.removeCredential(+id, user);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+    return await this.credentialService.removeCredential(+id, user);
   }
 }
