@@ -9,11 +9,9 @@ export class NoteRepository {
   constructor(private prisma: PrismaService) { }
 
   createNote(user: User, createNoteDto: CreateNoteDto) {
-    const { title, note } = createNoteDto;
     return this.prisma.note.create({
       data: {
-        title,
-        note,
+        ...createNoteDto,
         user: {
           connect: user
         }
