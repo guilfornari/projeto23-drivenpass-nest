@@ -1,24 +1,37 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { CardRepository } from './card.repository';
-import { User } from '@prisma/client';
+import { Card, User } from '@prisma/client';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Injectable()
 export class CardService {
-  constructor(private readonly cardRepository: CardRepository) { }
+  constructor(private readonly cardRepository: CardRepository,
+    private readonly cryptoService: CryptoService) { }
 
   async createCard(createCardDto: CreateCardDto, user: User) {
-    return await this.cardRepository.createCard(createCardDto, user);
+    const title = await this.cardRepository.findCardByTitle(createCardDto.title, user.id);
+    if (title) throw new ConflictException("You already have a note with this title");
+    return await this.cardRepository.createCard({
+      ...createCardDto,
+      safeCode: this.cryptoService.encrypt(createCardDto.safeCode),
+      password: this.cryptoService.encrypt(createCardDto.password)
+    }, user);
   }
 
   async findAllCards(userId: number) {
-    const Cryptr = require('cryptr');
-    const cryptr = new Cryptr('myTotallySecretKey');
     const cards = await this.cardRepository.findAllCards(userId);
-    const decryptedCards = cards.map((c) => {
-      return { ...c, safeCode: cryptr.decrypt(c.safeCode), password: cryptr.decrypt(c.password) }
+    return this.drecriptAllCards(cards);
+  }
+
+  private drecriptAllCards(cards: Card[]) {
+    return cards.map(card => {
+      return {
+        ...card,
+        safeCode: this.cryptoService.decrypt(card.safeCode),
+        password: this.cryptoService.decrypt(card.password)
+      }
     });
-    return decryptedCards;
   }
 
   async findOneCard(id: number, userId: number) {
@@ -26,22 +39,7 @@ export class CardService {
     if (!card) throw new HttpException("This card does not exist", HttpStatus.NOT_FOUND);
     if (card.userId !== userId) throw new HttpException("This is not your card", HttpStatus.FORBIDDEN);
 
-    const Cryptr = require('cryptr');
-    const cryptr = new Cryptr('myTotallySecretKey');
-
-    const decryptedCard = {
-      id: card.id,
-      title: card.title,
-      number: card.number,
-      name: card.name,
-      safeCode: cryptr.decrypt(card.safeCode),
-      expDate: card.expDate,
-      password: cryptr.decrypt(card.password),
-      virtual: card.virtual,
-      type: card.type,
-      userId: card.userId
-    }
-    return decryptedCard;
+    return this.drecriptAllCards([card]);
   }
 
   async removeCard(id: number, userId: number) {

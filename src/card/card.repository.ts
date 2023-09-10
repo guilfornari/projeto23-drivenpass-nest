@@ -8,28 +8,26 @@ export class CardRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   createCard(createCardDto: CreateCardDto, user: User) {
-    const { title, number, name, safeCode, expDate, password, virtual, type } = createCardDto;
-
-    const Cryptr = require('cryptr');
-    const cryptr = new Cryptr('myTotallySecretKey');
-    const encryptedsc = cryptr.encrypt(safeCode);
-    const encryptedpw = cryptr.encrypt(password);
 
     return this.prisma.card.create({
       data: {
-        title,
-        number,
-        name,
-        safeCode: encryptedsc,
-        expDate,
-        password: encryptedpw,
-        virtual,
-        type,
+        ...createCardDto,
         user: {
           connect: user
         }
       }
     });
+  }
+
+  findCardByTitle(title: string, userId: number) {
+    return this.prisma.card.findUnique({
+      where: {
+        title_userId: {
+          title,
+          userId
+        }
+      }
+    })
   }
 
   findAllCards(userId: number) {

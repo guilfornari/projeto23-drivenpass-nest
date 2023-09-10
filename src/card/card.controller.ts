@@ -18,22 +18,14 @@ export class CardController {
   @ApiCreatedResponse({ description: "Card saved" })
   @HttpCode(HttpStatus.CREATED)
   async createCard(@Body() createCardDto: CreateCardDto, @User() user: UserPrisma) {
-    try {
-      return this.cardService.createCard(createCardDto, user);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+    return this.cardService.createCard(createCardDto, user);
   }
 
   @Get()
   @ApiOperation({ summary: "Returns all user's cards" })
   @ApiOkResponse({ description: "Returns an array of cards" })
   async findAllCards(@User() user: UserPrisma) {
-    try {
-      return await this.cardService.findAllCards(user.id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+    return await this.cardService.findAllCards(user.id);
   }
 
   @Get(':id')
@@ -43,11 +35,8 @@ export class CardController {
   @ApiForbiddenResponse({ description: "Not your card" })
   @ApiParam({ name: "id", description: "An integer", example: 42 })
   async findOneCard(@Param('id') id: string, @User() user: UserPrisma) {
-    try {
-      return await this.cardService.findOneCard(+id, user.id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+    const card = await this.cardService.findOneCard(+id, user.id);
+    return card[0];
   }
 
   @Delete(':id')
@@ -57,10 +46,6 @@ export class CardController {
   @ApiForbiddenResponse({ description: "Not your card" })
   @ApiParam({ name: "id", description: "An integer", example: 42 })
   async removeCard(@Param('id') id: string, @User() user: UserPrisma) {
-    try {
-      return this.cardService.removeCard(+id, user.id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
+    return this.cardService.removeCard(+id, user.id);
   }
 }
