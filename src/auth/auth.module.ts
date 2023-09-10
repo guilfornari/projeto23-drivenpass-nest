@@ -6,12 +6,13 @@ import { UserModule } from "../user/user.module";
 import { PrismaModule } from "../prisma/prisma.module";
 import { UserService } from "../user/user.service";
 import { UserRepository } from "../user/user.repository";
+import { CryptoModule } from "../crypto/crypto.module";
 
 @Global()
 @Module({
   imports: [JwtModule.register({
     secret: process.env.JWT_SECRET
-  }), UserModule, PrismaModule],
+  }), UserModule, PrismaModule, CryptoModule],
   controllers: [AuthController],
   providers: [AuthService, UserService, UserRepository],
   exports: [AuthService]

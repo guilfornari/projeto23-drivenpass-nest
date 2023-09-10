@@ -5,9 +5,10 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { CredentialRepository } from './credential.repository';
 import { UserService } from '../user/user.service';
 import { UserRepository } from '../user/user.repository';
+import { CryptoModule } from '../crypto/crypto.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, CryptoModule],
   controllers: [CredentialController],
   providers: [CredentialService, CredentialRepository, UserService, UserRepository],
 })

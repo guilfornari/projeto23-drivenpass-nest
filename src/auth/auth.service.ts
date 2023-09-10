@@ -1,10 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { SignUpDto } from './dto/sign-up.dto';
 import SignInDto from './dto/sign-in.dto';
 import { UserService } from '../user/user.service';
-import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -18,13 +17,7 @@ export class AuthService {
     private readonly userService: UserService) { }
 
   async signUp(signUpDto: SignUpDto) {
-    const { email, password } = signUpDto;
-    const user = await this.userService.getUserByEmail(email);
-    if (user) throw new ConflictException("Email already in use.");
-
-    const incryptedPassword = bcrypt.hashSync(password, 10);
-
-    return await this.userService.createUser(email, incryptedPassword);
+    return await this.userService.createUser(signUpDto);
   }
 
   async signIn(signInDto: SignInDto) {
@@ -33,8 +26,8 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(email);
     if (!user) throw new UnauthorizedException(`Email or password not valid.`);
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new UnauthorizedException(`Email or password not valid.`);
+    const isMatch = await this.userService.isMatchforPassword(user, password)
+    if (!isMatch) throw new UnauthorizedException(`Email or password not valid.`);
 
     return this.createToken(user);
   }

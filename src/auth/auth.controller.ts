@@ -1,8 +1,9 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
-import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from '../decorators/user.decorator';
+import SignInDto from './dto/sign-in.dto';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+
 
 @ApiTags("authorization")
 @Controller('auth')
@@ -21,8 +22,8 @@ export class AuthController {
   @ApiOperation({ summary: "For an user to log in" })
   @ApiOkResponse({ description: "Logged in" })
   @HttpCode(HttpStatus.OK)
-  signIn(@Body() signUpDtoDto: SignUpDto) {
-    return this.authService.signIn(signUpDtoDto);
+  signIn(@Body() signInDto: SignInDto) {
+    return this.authService.signIn(signInDto);
   }
 
 }
