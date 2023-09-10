@@ -4,7 +4,7 @@ import { CreateCredentialDto } from './dto/create-credential.dto';
 import { AuthGuard } from '../guard/auth.guard';
 import { User as UserPrisma } from '@prisma/client';
 import { User } from '../decorators/user.decorator';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags("credential")
 @ApiBearerAuth()
@@ -44,7 +44,8 @@ export class CredentialController {
   @ApiParam({ name: "id", description: "An integer", example: 42 })
   async findOneCredential(@Param('id') id: string, @User() user: UserPrisma) {
     try {
-      return await this.credentialService.findOneCredential(+id, user);
+      const credential = await this.credentialService.findOneCredential(+id, user);
+      return credential[0];
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }

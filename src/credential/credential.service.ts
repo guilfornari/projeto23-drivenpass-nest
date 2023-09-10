@@ -38,18 +38,7 @@ export class CredentialService {
     if (!credential) throw new HttpException("This credential does not exist", HttpStatus.NOT_FOUND);
     if (credential.userId !== user.id) throw new HttpException("Not your credential", HttpStatus.FORBIDDEN);
 
-    const Cryptr = require('cryptr');
-    const cryptr = new Cryptr('myTotallySecretKey');
-
-    const decryptedCredential = {
-      id: credential.id,
-      title: credential.title,
-      url: credential.url,
-      username: credential.username,
-      credential_password: cryptr.decrypt(credential.credential_password),
-      userId: credential.userId
-    }
-    return decryptedCredential;
+    return this.decriptAllCredentials([credential]);
   }
 
   async removeCredential(id: number, user: User) {
